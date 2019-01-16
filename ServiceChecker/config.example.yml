@@ -1,0 +1,6 @@
+env: production
+services:
+  - name: some-service
+    urls: 
+      - http://some-service.internal.com
+    targetVersion: v0.9.0
