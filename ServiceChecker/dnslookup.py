@@ -7,9 +7,6 @@ from typing import List
 from aiodns.error import DNSError
 from urllib.parse import urlparse
 
-from constants import OK, ERROR
-
-
 Service = namedtuple("Service", ['host', 'port'])
 
 
@@ -39,13 +36,11 @@ async def resolve_service(service, dns_resolver):
     lookup_result = await _lookup(selected_domain, dns_resolver)
 
     if lookup_result.success:
-        status = OK
         selected_domain = [f"{prefix}{svc.host}:{svc.port}" for svc in lookup_result.services]
     else:
-        status = ERROR
         selected_domain = []
 
-    return status, selected_domain
+    return selected_domain
 
 
 def split_domain(addr):
