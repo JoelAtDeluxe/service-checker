@@ -3,5 +3,5 @@ services:
   - name: some-service
     url: http://some-service.internal.com
     target_version: v0.9.0
-    version_endpoint: /v1/status
+    version_endpoint: v1/status
     expected_nodes: 3
