@@ -41,12 +41,12 @@ async def main_loop(lookup, session, services):
     checking_services = [*services]
     while not stop:
         tasks = []
-        for service in checking_services:
+        for service in [s for s in checking_services if s.get('done', False) == False]:
             tasks.append(process_domain(service['url'], service['version_endpoint'], lookup, session))
 
         results = await asyncio.gather(*tasks)
 
-        for idx, service in enumerate(checking_services):
+        for idx, service in enumerate([s for s in checking_services if s.get('done', False) == False]):
             service['current_versions'] = results[idx]
 
         for service in checking_services:
@@ -58,7 +58,8 @@ async def main_loop(lookup, session, services):
                 else:
                     service['status'] = 'good'
 
-        if len([1 for s in checking_services if s.get('done')]) == 0:
+        # import pdb; pdb.set_trace()
+        if len([1 for s in checking_services if s.get('done', False) == False]) == 0:
             stop = True
         else:
             await asyncio.sleep(3)
