@@ -7,6 +7,9 @@ name = "pypi"
 asyncio = "*"
 aiodns = "*"
 aiohttp = "*"
+rope = "*"
+cchardet = "*"
+pyyaml = "*"
 
 [dev-packages]
 "pep8" = "*"
