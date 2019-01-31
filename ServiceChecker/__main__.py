@@ -8,6 +8,7 @@ import time
 import random
 import yaml
 from functools import reduce
+import datetime
 
 async def fetch_json(url, session):
     async with session.get(url) as response:
@@ -36,6 +37,13 @@ def compress_service_versions(acc, cur):
     return acc
 
 
+def format_service_line(service, node_info):
+    status_mark = '✔ ' if service.get('done') else ''
+    finish_time = f' @ {service.get("finished_at")}' if service.get('finished_at') is not None else ''
+    node_expanded = [f'{k} x {v} nodes' for k, v in sorted(node_info.items())]
+
+    return f"{status_mark}{service['name']} -> {node_expanded} {finish_time}"
+
 async def main_loop(lookup, session, services):
     stop = False
     checking_services = [*services]
@@ -51,12 +59,15 @@ async def main_loop(lookup, session, services):
 
         for service in checking_services:
             compressed_services = reduce(compress_service_versions, service['current_versions'], {})
-            print(f"{service['name']} -> {[f'{k} x {v} nodes' for k, v in compressed_services.items()]}")
+            print(format_service_line(service, compressed_services))
+
             if compressed_services.get(service['target_version']) == service['expected_nodes']:
                 if service.get('status') == 'good':
                     service['done'] = True
+                    service['finished_at'] = datetime.datetime.now().time()
                 else:
                     service['status'] = 'good'
+        print('--------------')
 
         # import pdb; pdb.set_trace()
         if len([1 for s in checking_services if s.get('done', False) == False]) == 0:
